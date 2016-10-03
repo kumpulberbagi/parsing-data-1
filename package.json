@@ -1,0 +1,23 @@
+{
+  "name": "parsing-data-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "parser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blanford-fox-2016/parsing-data-1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blanford-fox-2016/parsing-data-1/issues"
+  },
+  "homepage": "https://github.com/blanford-fox-2016/parsing-data-1#readme",
+  "dependencies": {
+    "csvtojson": "^1.0.2",
+    "fast-csv": "^2.3.0"
+  }
+}
