@@ -2,7 +2,7 @@
 
 var csv = require("fast-csv");
 const fs = require('fs');
-
+var faker = require('faker')
 class Person {
   constructor(property){
       this._id = property['id']
@@ -72,6 +72,14 @@ class PersonParser {
      }).on("end", function(data){
        PersonParser.addPerson(biodata) // Ternyata bisa menggunakan method static
        PersonParser.addPerson(biodata1)
+       for(var i=0; i<100; i++){ // add 100 random person
+         PersonParser.addPerson(new Person({id: 203+i, firstName:faker.name.firstName(),
+         lastName:faker.name.lastName(),
+         email:faker.internet.email(),
+         phone:faker.phone.phoneNumber(),
+         createdAt: new Date()
+       }))
+       }
        for(var i=0; i<database.length; i++){
          rewrite += `${database[i].id}, ${database[i].firstName}, ${database[i].lastName}, ${database[i].email}, ${database[i].phone}, ${database[i].createdAt} \n`
        }
@@ -95,6 +103,6 @@ class PersonParser {
 let parser = new PersonParser('people.csv')
 parser.getPeople()
 function string(){
-  console.log(`There are ${parser.people.length} people in the file '${parser.file()}'.`)
+  console.log(`There are ${parser.people.length - 1} people in the file 'parserized.csv'.`)
 }
-  setTimeout(string, 1000)
+  setTimeout(string, 100)
