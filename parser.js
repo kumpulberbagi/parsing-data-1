@@ -1,32 +1,70 @@
 "use strict"
-
+var csv = require("fast-csv");
+const fs = require('fs');
+let database= [];
+let array_to_string ="";
 class Person {
-  // Look at the above CSV file
-  // What attributes should a Person object have?
+  constructor(person){
+  this.userId = person['userId'];
+  this.first_name = person['first_name'];
+  this.last_name = person['last_name'];
+  this.email = person['email'];
+  this.phone = person['phone'];
+  this.created_at = person['created_at'];
+  }
 }
+var person = new Person({
+  userId:201,
+  first_name:'toni',
+  last_name:'chen',
+  email:'tony_chen93@yahoo.com',
+  phone:08974237854,
+  created_at:201511028700
+
+})
+
+var person1 = new Person({
+  userId:202,
+  first_name:'Tama',
+  last_name:'Adhi',
+  email:'tama@tamatamvan.web.id',
+  phone:085695434151,
+  created_at:201511028700
+
+})
 
 class PersonParser {
-
   constructor(file) {
     this._file = file
     this._people = null
   }
-
   get people() {
-    // If we've already parsed the CSV file, don't parse it again
-    // Remember: people is null by default
+    csv
+     .fromPath(this._file)
+     .on("data", function(data){
+      database.push(new Person({userId: data[0], first_name: data[1], last_name: data[2], email:data[3], phone: data[4], created_at: data[5]}))
+     })
+     .on("end", function(){
+       parser.addPerson(person)
+      parser.addPerson(person1)
+       for(let idx in database){
+         array_to_string += database[idx].userId +","+database[idx].first_name+","+database[idx].last_name+","+database[idx].email+","+database[idx].phone+","+new Date(database[idx].created_at)+"\n";
+       }
+       console.log(array_to_string);
+       parser.save(array_to_string);
+     });
     if (this._people)
-      return this._people
-
-    // We've never called people before, now parse the CSV file
-    // and return an Array of Person objects here
-    // Save the Array in the people instance variable.
+      return this._people;
   }
 
-  addPerson() {}
-
+  addPerson(person)
+  {
+    database.push(new Person(person))
+  }
+  save(array_to_string){
+    fs.writeFile('new_person.csv', array_to_string);
+  }
 }
 
-let parser = new PersonParser('people.csv')
-
-console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
+let parser = new PersonParser('people.csv');
+parser.people;
