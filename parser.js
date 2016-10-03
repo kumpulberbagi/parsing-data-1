@@ -1,5 +1,5 @@
 "use strict"
-var csv = require("fast-csv");
+let csv = require("fast-csv");
 const fs = require('fs');
 let database= [];
 let array_to_string ="";
@@ -13,7 +13,7 @@ class Person {
   this.created_at = person['created_at'];
   }
 }
-var person = new Person({
+let person = new Person({
   userId:201,
   first_name:'toni',
   last_name:'chen',
@@ -23,7 +23,7 @@ var person = new Person({
 
 })
 
-var person1 = new Person({
+let person1 = new Person({
   userId:202,
   first_name:'Tama',
   last_name:'Adhi',
@@ -59,7 +59,7 @@ class PersonParser {
 
   addPerson(person)
   {
-    database.push(new Person(person))
+    database.push(person)
   }
   save(array_to_string){
     fs.writeFile('new_person.csv', array_to_string);
