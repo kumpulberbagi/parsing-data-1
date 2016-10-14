@@ -3,6 +3,7 @@
 var csv = require("fast-csv");
 const fs = require('fs');
 var faker = require('faker')
+let repl = require('repl')
 class Person {
   constructor(property){
       this._id = property['id']
@@ -52,6 +53,7 @@ var biodata1 = {
 
 var database = []
 var rewrite =""
+var file
 class PersonParser {
   constructor(file) {
     this._file = file
@@ -61,48 +63,62 @@ class PersonParser {
   }
   set people(value){this._people = value}
   get people(){return this._people}
-   file(){return this._file}
+  get file(){return this._file}
 
-   getPeople() {
+   release0(filename){ //<<< need filename
+     csv.fromPath(filename).on('data', function(data) {
+       console.log(data);
+     }).on('end', function(data){
+       this._people = data
+       console.log(`There are ${data-1} people in file ${filename}`);
+     })
+   }
+
+   release1(filename) { //<<< need filename
     // If we've already parsed the CSV file, don't parse it again
     // Remember: people is null by default
-    csv.fromPath(this._file)
+    csv.fromPath(filename)
      .on("data", function(data){
+      //  console.log(data);
        PersonParser.addPerson(new Person({id : data[0], firstName: data[1], lastName: data[2], email: data[3], phone: data[4], createdAt: data[5]}))
      }).on("end", function(data){
-       PersonParser.addPerson(biodata) // Ternyata bisa menggunakan method static
-       PersonParser.addPerson(biodata1)
-       for(var i=0; i<100; i++){ // add 100 random person
-         PersonParser.addPerson(new Person({id: 203+i, firstName:faker.name.firstName(),
-         lastName:faker.name.lastName(),
-         email:faker.internet.email(),
-         phone:faker.phone.phoneNumber(),
-         createdAt: new Date()
-       }))
-       }
-       for(var i=0; i<database.length; i++){
-         rewrite += `${database[i].id}, ${database[i].firstName}, ${database[i].lastName}, ${database[i].email}, ${database[i].phone}, ${database[i].createdAt} \n`
-       }
-       parser.save(rewrite)
+       PersonParser.add100randomPerson(database.length-1)
+       console.log(`100 random person added`);
+       console.log(`There are ${database.length-1} person in file ${filename}`);
+       PersonParser.stringify()
+       PersonParser.save()
      })
     // We've never called people before, now parse the CSV file
     // and return an Array of Person objects here
     // Save the Array in the people instance variable.
-    this._people = database
   }
 
    static addPerson(value) {
     database.push(value)
   }
 
-  save(value){
-    fs.writeFile('parserized.csv', value)
+  static add100randomPerson(data){
+    for(var i=1; i<=100; i++){ // add 100 random person
+      PersonParser.addPerson(new Person({id: data+i, firstName:faker.name.firstName(),
+      lastName:faker.name.lastName(),
+      email:faker.internet.email(),
+      phone:faker.phone.phoneNumber(),
+      createdAt: new Date()
+    }))
+    }
+  }
+  static stringify(){
+    for(var i=0; i<database.length; i++){
+      rewrite += `${database[i].id}, ${database[i].firstName}, ${database[i].lastName}, ${database[i].email}, ${database[i].phone}, ${database[i].createdAt} \n`
+    }
+  }
+
+  static save(){
+    fs.writeFile('people.csv', rewrite,'utf8')
   }
 }
 
-let parser = new PersonParser('people.csv')
-parser.getPeople()
-function string(){
-  console.log(`There are ${parser.people.length - 1} people in the file 'parserized.csv'.`)
-}
-  setTimeout(string, 100)
+let parser = new PersonParser()
+var r = repl.start('> ')
+r.context.release0 = parser.release0
+r.context.release1 = parser.release1 // <insert filename // will add 100 random people each run
